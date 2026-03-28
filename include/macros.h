@@ -18,3 +18,8 @@
 #else
     #define DEBUG_PRINT(fmt, ...) do {} while(0)
 #endif
+
+// printf com cores
+#define print_str(color,fmt, ...) \
+	printf(color fmt RESET, ##__VA_ARGS__)
+// nota fmt: format string

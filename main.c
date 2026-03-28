@@ -2,20 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+// consider using
+// #include <stdint.h>
+// #include <inttypes.h>  // for format specifiers
+// note: enums can have different sizes
+
 #include <stdbool.h>
 
 #include "./include/macros.h"
 #include "./include/types.h"
 #include "./include/flags.h"
+#include "./include/criar_registro.h"
 
 #define TAM_INPUT 16
-#define TAM_REGISTRO 438L
+#define TAM_REGISTRO 451L
 #define ARQUIVO_DADOS "./dados.bin"
-
-#define print_str(color,str, ...) \
-	printf(color str RESET, ##__VA_ARGS__)
-
-static Membro* criar_registro(void);
 
 int main(int argc, char *argv[])
 {
@@ -102,7 +103,7 @@ int main(int argc, char *argv[])
 
 		switch (option)
 		{
-			case '1': criar_registro();
+			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
 				break;
 			case '2': //search();
 				break;
@@ -122,40 +123,4 @@ int main(int argc, char *argv[])
 		}
 	}
 	return EXIT_SUCCESS;
-}
-
-static Membro* criar_registro(void)
-{
-	static Membro membro;
-
-	system("clear||cls");
-	print_str(RED, "\n CRIANDO REGISTRO:\n");
-
-	print_str(GREEN, " nome completo: ");
-	scanf("%s", membro.nome); // não lê a linha completa, para no primeiro white-space
-	print_str(GREEN, " n° de disciplinas: ");
-	scanf("%u", &membro.numero_de_disciplinas);
-
-	// gerar_grade()
-
-	print_str(GREEN, " aluno(0) ou professor(1): ");
-	ler_tipo: scanf("%d", (int *) &membro.tipo);
-
-	switch (membro.tipo)
-	{
-		case ALUNO:
-			//criar_registro_aluno();
-			DEBUG_PRINT("tipo ALUNO\n");
-			break;
-		case PROFESSOR:
-			//criar_registro_professor();
-			DEBUG_PRINT("tipo PROFESSOR\n");
-			break;
-		default:
-			print_str(RED," '%d' opção inválida!\n",membro.tipo);
-			print_str(RED," tente novamente: ");
-			goto ler_tipo;
-	}
-
-	return &membro;
 }

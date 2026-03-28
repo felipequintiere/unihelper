@@ -29,7 +29,7 @@
 
 typedef struct {    // ESTRUTURA ALUNO
 	unsigned long long matricula;
-	unsigned int periodo;
+	unsigned short int periodo;
 } Dados_aluno;
 
 typedef struct {    // ESTRUTURA PROFESSOR
@@ -38,12 +38,13 @@ typedef struct {    // ESTRUTURA PROFESSOR
 } Dados_professor;
 
 typedef struct {    // ESTRUTRURA COMUM ENTRE OS TIPOS
-	bool status_de_validacao;      // indicador de remoção
-	unsigned int id_unico;         // gerado automaticamente
+	//bool status_de_validacao;
+	short int status_de_validacao;  // indicador de remoção
+	unsigned int id_unico;  // gerado automaticamente
 
 	signed char nome[TAMANHO_NOME+1];
-	unsigned int numero_de_disciplinas;
-	unsigned int grade[DIAS][TURNOS];
+	int numero_de_disciplinas;
+	int grade[DIAS][TURNOS];
 	// grade de horários [i][j]
 	//     i: dias da semana (seg <-> sex)
 	//     j: horários (m1 <-> t3 <-> n6)

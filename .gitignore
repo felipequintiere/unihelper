@@ -1,5 +1,12 @@
-# ignorar object files
+# object files
 *.o
 
-# ignorar executável
+# executável
 a.out
+*.exe
+
+# arquivos de dados
+dados.bin
+
+# swap file
+*.swp
