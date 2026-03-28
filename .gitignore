@@ -1,0 +1,5 @@
+# ignorar object files
+*.o
+
+# ignorar executável
+a.out
