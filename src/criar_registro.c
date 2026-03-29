@@ -60,22 +60,22 @@ Membro* criar_registro(const char * const arquivo)
 	
 	FILE *fp = fopen(arquivo, "ab+");
 
-	fwrite(&membro.status_de_validacao, sizeof(membro.status_de_validacao), 1, fp);
-	fwrite(&membro.id_unico, sizeof(membro.id_unico), 1, fp);
-	fwrite(&membro.nome, sizeof(membro.nome), 1, fp);
+	fwrite(&membro.status_de_validacao,   sizeof(membro.status_de_validacao), 1, fp);
+	fwrite(&membro.id_unico,              sizeof(membro.id_unico), 1, fp);
+	fwrite(&membro.nome,                  sizeof(membro.nome), 1, fp);
 	fwrite(&membro.numero_de_disciplinas, sizeof(membro.numero_de_disciplinas), 1, fp);
-	fwrite(&membro.grade, sizeof(membro.grade), 1, fp);
+	fwrite(&membro.grade,                 sizeof(membro.grade), 1, fp);
 
 	fwrite(&membro.tipo, sizeof(membro.tipo), 1, fp);
 	if (membro.tipo == ALUNO)
 	{
 		fwrite(&membro.dados.aluno.matricula, sizeof(membro.dados.aluno.matricula), 1, fp);
-		fwrite(&membro.dados.aluno.periodo, sizeof(membro.dados.aluno.periodo), 1, fp);
+		fwrite(&membro.dados.aluno.periodo,   sizeof(membro.dados.aluno.periodo), 1, fp);
 	}
 	else if (membro.tipo == PROFESSOR)
 	{
 		fwrite(&membro.dados.professor.registro, sizeof(membro.dados.professor.registro), 1, fp);
-		fwrite(&membro.dados.professor.salario, sizeof(membro.dados.professor.salario), 1, fp);
+		fwrite(&membro.dados.professor.salario,  sizeof(membro.dados.professor.salario), 1, fp);
 	}
 /*
        size_t fwrite(const void ptr[restrict .size * .nmemb],
@@ -94,6 +94,7 @@ Membro* criar_registro(const char * const arquivo)
 	return &membro;
 }
 
+// debug
 void determinar_o_tamanho_da_struct(Membro *membro)
 {
 #define print_size(variavel, tipo) \
@@ -123,4 +124,5 @@ void determinar_o_tamanho_da_struct(Membro *membro)
 
 	size_final += ((size_aluno > size_professor) ? size_aluno : size_professor);
 	DEBUG_PRINT("\n tamanho efetivo do registro em bytes: %zu",size_final);
+#undef print_size
 }

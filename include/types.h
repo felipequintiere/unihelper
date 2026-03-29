@@ -27,17 +27,17 @@
 #define DIAS 5
 #define TURNOS 18
 
-typedef struct {    // ESTRUTURA ALUNO
+typedef struct {  // ESTRUTURA ALUNO
 	unsigned long long matricula;
 	unsigned short int periodo;
 } Dados_aluno;
 
-typedef struct {    // ESTRUTURA PROFESSOR
+typedef struct {  // ESTRUTURA PROFESSOR
 	unsigned long long registro;
 	float salario;
 } Dados_professor;
 
-typedef struct {    // ESTRUTRURA COMUM ENTRE OS TIPOS
+typedef struct {  // ESTRUTRURA COMUM ENTRE OS TIPOS
 	//bool status_de_validacao;
 	short int status_de_validacao;  // indicador de remoção
 	unsigned int id_unico;  // gerado automaticamente
@@ -55,5 +55,7 @@ typedef struct {    // ESTRUTRURA COMUM ENTRE OS TIPOS
 		Dados_aluno aluno;
 		Dados_professor professor;
 	} dados;
+	// nota: structs/unions anônimos são padrão apenas a partir 
+	// do C11
 } Membro;
 
