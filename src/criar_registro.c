@@ -4,53 +4,60 @@
 #include "../include/types.h"
 #include "../include/criar_registro.h"
 
-void determinar_o_tamanho_da_struct(Membro*);
+void determinar_o_tamanho_da_struct(Membro*); // só é usada aqui
 
 Membro* criar_registro(const char * const arquivo)
 {
 	system("clear||cls");
 
 	static Membro membro = { .nome = {0} };
+
 #if defined(DEBUG) && DEBUG==1
 	determinar_o_tamanho_da_struct(&membro);
 #endif
 
-	print_str(PURPLE, "\n CRIANDO REGISTRO:\n");
+	// criar uma função para evitar o ^d, pois sem isso,
+	// a aplicação ainda continua escrevendo para o arquivo de dados
+	PRINT_STR(PURPLE, "\n CRIANDO REGISTRO:\n");
 
-	print_str(GREEN, " nome completo: ");
-	scanf("%s", membro.nome); // não lê a linha completa, para no primeiro white-space
-	print_str(GREEN, " n° de disciplinas: ");
-	scanf("%d", &membro.numero_de_disciplinas);
-	print_str(GREEN, " grade: ");
+	PRINT_STR(GREEN, " nome completo: ");
+	fgets(membro.nome,TAMANHO_NOME+1,stdin); // espera 'char *' e não 'signed char *'
+
+	PRINT_STR(GREEN, " n° de disciplinas: ");
+	scanf("%d*c", &membro.numero_de_disciplinas);
+
+	PRINT_STR(GREEN, " grade: ");
 	// gerar_grade()
 
-	print_str(GREEN, " aluno(0) ou professor(1): ");
-	ler_tipo: scanf("%d", (int *) &membro.tipo);
+	PRINT_STR(GREEN, " aluno(0) ou professor(1): ");
+	ler_tipo: scanf("%d*c", (int *) &membro.tipo);
 	switch (membro.tipo)
 	{
-		case ALUNO: {
-			DEBUG_PRINT("tipo ALUNO\n");
+		case ALUNO:
+		{
+			PRINT_DEBUG("tipo ALUNO\n");
 
-			print_str(GREEN, " matrícula: ");
-			scanf("%llu", &membro.dados.aluno.matricula);
-			print_str(GREEN, " período: ");
-			scanf("%hu", &membro.dados.aluno.periodo);
+			PRINT_STR(GREEN, " matrícula: ");
+			scanf("%llu*c", &membro.dados.aluno.matricula);
+			PRINT_STR(GREEN, " período: ");
+			scanf("%hu*c", &membro.dados.aluno.periodo);
 			break;
 		}
 
-		case PROFESSOR: {
-			DEBUG_PRINT("tipo PROFESSOR\n");
+		case PROFESSOR:
+		{
+			PRINT_DEBUG("tipo PROFESSOR\n");
 
-			print_str(GREEN, " registro: ");
+			PRINT_STR(GREEN, " registro: ");
 			scanf("%llu", &membro.dados.professor.registro);
-			print_str(GREEN, " salário: ");
+			PRINT_STR(GREEN, " salário: ");
 			scanf("%f", &membro.dados.professor.salario);
 			break;
 		}
 
 		default:
-			print_str(RED," '%d' opção inválida!\n",membro.tipo);
-			print_str(RED," tente novamente: ");
+			PRINT_STR(RED," '%d' opção inválida!\n",membro.tipo);
+			PRINT_STR(RED," tente novamente: ");
 			goto ler_tipo;
 	}
 
@@ -58,7 +65,11 @@ Membro* criar_registro(const char * const arquivo)
 	//membro.id_unico = 1; ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	
-	FILE *fp = fopen(arquivo, "ab+");
+	FILE *fp;
+	if ((fp = fopen(arquivo,"ab+")) == NULL)
+	{
+		exit(EXIT_FAILURE);
+	}
 
 	fwrite(&membro.status_de_validacao,   sizeof(membro.status_de_validacao), 1, fp);
 	fwrite(&membro.id_unico,              sizeof(membro.id_unico), 1, fp);
@@ -97,32 +108,40 @@ Membro* criar_registro(const char * const arquivo)
 // debug
 void determinar_o_tamanho_da_struct(Membro *membro)
 {
-#define print_size(variavel, tipo) \
-    do { \
-        (variavel) += sizeof((tipo)); \
-        printf(RED" %-3zu : "#tipo" \n"RESET, sizeof(tipo)); \
-    } while(0)
+#define PRINT_SIZE(variavel, tipo) \
+	( ((variavel)+=sizeof(tipo)) , \
+	  printf(RED" %-3zu : "#tipo" \n"RESET, sizeof(tipo)) )
+/*
+	do { \
+		(variavel) += sizeof((tipo)); \
+		printf(RED" %-3zu : "#tipo" \n"RESET, sizeof(tipo)); \
+	} while(0)
+*/
 
     size_t size_final = 0;
 	printf("\n comum:\n");
-    print_size(size_final, membro->status_de_validacao);
-    print_size(size_final, membro->id_unico);
-    print_size(size_final, membro->nome);
-    print_size(size_final, membro->numero_de_disciplinas);
-    print_size(size_final, membro->grade);
-	print_size(size_final, membro->tipo);
+    PRINT_SIZE(size_final, membro->status_de_validacao);
+    PRINT_SIZE(size_final, membro->id_unico);
+    PRINT_SIZE(size_final, membro->nome);
+    PRINT_SIZE(size_final, membro->numero_de_disciplinas);
+    PRINT_SIZE(size_final, membro->grade);
+	PRINT_SIZE(size_final, membro->tipo);
+	// nota: está passando uma expressão cujo tipo será inferido; 
+	// passar diretamente o membro da struct para o sizeof previne
+	// a leitura de tamanhos distintos caso o tipo do membro da 
+	// struct seja alterado
 
     size_t size_aluno = 0;
 	printf("\n aluno:\n");
-    print_size(size_aluno, membro->dados.aluno.matricula);
-    print_size(size_aluno, membro->dados.aluno.periodo);
+    PRINT_SIZE(size_aluno, membro->dados.aluno.matricula);
+    PRINT_SIZE(size_aluno, membro->dados.aluno.periodo);
 
     size_t size_professor = 0;
 	printf("\n professor: \n");
-    print_size(size_professor, membro->dados.professor.registro);
-    print_size(size_professor, membro->dados.professor.salario);
+    PRINT_SIZE(size_professor, membro->dados.professor.registro);
+    PRINT_SIZE(size_professor, membro->dados.professor.salario);
 
 	size_final += ((size_aluno > size_professor) ? size_aluno : size_professor);
-	DEBUG_PRINT("\n tamanho efetivo do registro em bytes: %zu",size_final);
-#undef print_size
+	PRINT_DEBUG("\n tamanho efetivo do registro em bytes: %zu",size_final);
+#undef PRINT_SIZE
 }

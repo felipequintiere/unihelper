@@ -39,36 +39,48 @@ int main(int argc, char *argv[])
 			if (argc == 2)
 			{
 				printf(
-				"error: a value is required for '--file <DATA_FILE>' but none "
-			   	"was supplied\n\nFor more information, try '--help'."
+					"error: a value is required for '--file <FILE>' but none "
+					"was supplied\n\nFor more information, try '--help'.\n"
 				);
 				exit(EXIT_SUCCESS);
 			}
 			else if (argc > 3)
 			{
-				printf("error: unrecognized subcommand '%s'",argv[3]);
-				printf("\n\nFor more information, try '--help'.");
+				printf(
+					"error: unrecognized subcommand '%s'"
+					"\n\nFor more information, try '--help'.\n", argv[3]
+				);
 				exit(EXIT_SUCCESS);
 			}
 			else
 			{
-				// armazenar o nome do arquivo escolhido pelo usuário (-f)
-				arquivo = argv[2];
-				DEBUG_PRINT("%s\n",arquivo);  // remova o próximo clear||cls
+				FILE *fp;
+				if ((fp = fopen(argv[2],"r")) == NULL)
+				{
+					printf("error: file '%s' does not exist\n",argv[2]);
+					exit(EXIT_FAILURE);
+				}
+				fclose(fp);
+
+				arquivo = argv[2]; // armazenar o nome do arquivo escolhido
+				PRINT_DEBUG("%s\n",arquivo);
 			}
 		}
 		else
 		{
 			flag_invalid(argv);  // passa todos os argumentos
-			exit(EXIT_SUCCESS);
+			exit(EXIT_FAILURE);
 		}
 	}
 
-	//system("clear||cls");
+#if defined(DEBUG) && DEBUG==1
+	system("clear||cls");
+#endif
+
 	int option;
 	for (;;)
 	{
-		print_str(CYAN,"\n"
+		PRINT_STR(CYAN,"\n"
 		" [1] criar registro\n"
 		" [2] editar registro\n"
 		" [3] remover registro\n"
@@ -76,23 +88,13 @@ int main(int argc, char *argv[])
 		" [5] buscar registro por nome\n"
 		" [6] listar registros\n"
 		" [7] sair\n\n");
-		print_str(PURPLE," Escolha uma opção: ");
+		PRINT_STR(PURPLE," Escolha uma opção: ");
 
-		// se o usuário inserir ^D
-		if ((option = fgetc(stdin)) == EOF)
+		if ((option = fgetc(stdin)) == EOF)  // se o usuário inserir ^D
 		{
-			DEBUG_PRINT("entrada: EOF\n");
-
-			//exit(EXIT_SUCCESS); // ^D termina a execução
-			clearerr(stdin);    // reseta o estado EOF de stdin
-			continue;
+			PRINT_DEBUG("entrada: EOF\n");
+			exit(EXIT_SUCCESS);  // ^D termina a execução
 		}
-
-		// para descartar o resto da entrada
-		int ch;
-		while ((ch = fgetc(stdin)) != '\n' && ch != EOF)
-			;
-
 		//         scanf(" %c", &option); 
 		// nota:
 		// Em uma entrada como "abcde...", esse scanf leria o
@@ -101,7 +103,7 @@ int main(int argc, char *argv[])
 		// chamadas do scanf leriam esses valores armazenados no
 		// buffer 
 
-		switch (option)
+		switch ((char) option)
 		{
 			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
 				break;
@@ -116,7 +118,7 @@ int main(int argc, char *argv[])
 			case '7':
 				exit(EXIT_SUCCESS);
 			default:
-				print_str(RED," '%c' opção inválida!\n",option);
+				PRINT_STR(RED," '%c' opção inválida!\n",option);
 				//RETURN VALUE fgetc(3)
 				//	fgetc(), getc(), and getchar() return the character read as an
 				//	unsigned char cast to an int or EOF on end of file or error.

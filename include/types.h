@@ -42,7 +42,8 @@ typedef struct {  // ESTRUTRURA COMUM ENTRE OS TIPOS
 	short int status_de_validacao;  // indicador de remoção
 	unsigned int id_unico;  // gerado automaticamente
 
-	signed char nome[TAMANHO_NOME+1];
+	//signed char nome[TAMANHO_NOME+1];
+	char nome[TAMANHO_NOME+1]; // fgets espera 'char *' e não 'unsigned char*'
 	int numero_de_disciplinas;
 	int grade[DIAS][TURNOS];
 	// grade de horários [i][j]

@@ -12,14 +12,14 @@
 
 // nota: o macro DEBUG é definido no makefile
 #if defined(DEBUG) && DEBUG==1
-    #define DEBUG_PRINT(fmt, ...) \
-        fprintf(stderr, RED"\n [DEBUG] %s:%d: "RESET \
-				fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+	#define PRINT_DEBUG(fmt, ...) \
+		printf(RED"\n [DEBUG] %s:%d: "RESET \
+			fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #else
-    #define DEBUG_PRINT(fmt, ...) do {} while(0)
+	#define PRINT_DEBUG(fmt, ...) do {} while(0)
 #endif
 
 // printf com cores
-#define print_str(color,fmt, ...) \
-	printf(color fmt RESET, ##__VA_ARGS__)
-// nota fmt: format string
+#define PRINT_STR(COLOR,fmt, ...) \
+	printf(COLOR fmt RESET, ##__VA_ARGS__)
+// nota: fmt - format string
