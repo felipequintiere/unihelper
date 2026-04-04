@@ -14,13 +14,14 @@
 #include "./include/flags.h"
 #include "./include/criar_registro.h"
 
-#define TAM_INPUT 16
 #define TAM_REGISTRO 451L
 #define ARQUIVO_DADOS "./dados.bin"
 
+void ler_entrada(int, char entrada[*]);
+
 int main(int argc, char *argv[])
 {
-	static char *arquivo = ARQUIVO_DADOS;
+	char *arquivo = ARQUIVO_DADOS;
 
 	if (argc >= 2)
 	{
@@ -38,26 +39,26 @@ int main(int argc, char *argv[])
 		{
 			if (argc == 2)
 			{
-				printf(
+				fprintf(stderr,
 					"error: a value is required for '--file <FILE>' but none "
 					"was supplied\n\nFor more information, try '--help'.\n"
 				);
-				exit(EXIT_SUCCESS);
+				exit(EXIT_FAILURE);
 			}
 			else if (argc > 3)
 			{
-				printf(
+				fprintf(stderr,
 					"error: unrecognized subcommand '%s'"
 					"\n\nFor more information, try '--help'.\n", argv[3]
 				);
-				exit(EXIT_SUCCESS);
+				exit(EXIT_FAILURE);
 			}
 			else
 			{
 				FILE *fp;
-				if ((fp = fopen(argv[2],"r")) == NULL)
+				if ((fp = fopen(argv[2],"rb")) == NULL)
 				{
-					printf("error: file '%s' does not exist\n",argv[2]);
+					fprintf(stderr,"error: file '%s' does not exist\n",argv[2]);
 					exit(EXIT_FAILURE);
 				}
 				fclose(fp);
@@ -77,7 +78,8 @@ int main(int argc, char *argv[])
 	system("clear||cls");
 #endif
 
-	int option;
+	char entrada[ENTRADA_LEN+1] = {0};
+
 	for (;;)
 	{
 		PRINT_STR(CYAN,"\n"
@@ -88,13 +90,9 @@ int main(int argc, char *argv[])
 		" [5] buscar registro por nome\n"
 		" [6] listar registros\n"
 		" [7] sair\n\n");
-		PRINT_STR(PURPLE," Escolha uma opção: ");
+		PRINT_STR(PURPLE,"Escolha uma opção: ");
 
-		if ((option = fgetc(stdin)) == EOF)  // se o usuário inserir ^D
-		{
-			PRINT_DEBUG("entrada: EOF\n");
-			exit(EXIT_SUCCESS);  // ^D termina a execução
-		}
+		ler_entrada(ENTRADA_LEN+1,entrada);	
 		//         scanf(" %c", &option); 
 		// nota:
 		// Em uma entrada como "abcde...", esse scanf leria o
@@ -103,7 +101,7 @@ int main(int argc, char *argv[])
 		// chamadas do scanf leriam esses valores armazenados no
 		// buffer 
 
-		switch ((char) option)
+		switch (entrada[0])
 		{
 			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
 				break;
@@ -118,11 +116,64 @@ int main(int argc, char *argv[])
 			case '7':
 				exit(EXIT_SUCCESS);
 			default:
-				PRINT_STR(RED," '%c' opção inválida!\n",option);
-				//RETURN VALUE fgetc(3)
-				//	fgetc(), getc(), and getchar() return the character read as an
-				//	unsigned char cast to an int or EOF on end of file or error.
+				fprintf(stderr,"opção '%c' inválida!\n",entrada[0]);
+			//RETURN VALUE fgetc(3)
+			//	fgetc(), getc(), and getchar() return the character read as an
+			//	unsigned char cast to an int or EOF on end of file or error.
 		}
 	}
 	return EXIT_SUCCESS;
+}
+
+void ler_entrada(int tamanho, char entrada[tamanho])
+{
+	validar_entrada :
+	while (fgets(entrada,tamanho,stdin) == NULL)
+	{
+		// fgets retorna NULL quando ocorre:
+		//     erro de leitura
+		//     eof antes da leitura de caracteres 
+		if (feof(stdin))
+		{
+			fprintf(stderr,"\n"
+				"    end of file occurs while no characters have been read\n"	
+				"    end-of-file indicator is set for the stream\n\n"
+			);
+		}
+		if (ferror(stdin))
+		{
+			fprintf(stderr,"\n"
+				"    read error\n"
+				"    error indicator is set for the stream\n\n"
+			);
+
+		}
+		clearerr(stdin);	
+
+		PRINT_STR(PURPLE,"tente novamente: ");
+	}
+
+    // remover \n (\n\r ou \r) da string que armazena a entrada do usuário
+	int i = 0;
+	for (i=0; i<tamanho; i++)
+	{
+		if (entrada[i] == '\n' || entrada[i] == '\r') 
+		{
+			entrada[i] = '\0';
+			break;
+		}
+	}
+
+	// garantir que a string tenha ao menos um caractere
+	if (i==0)
+	{
+		fprintf(stderr,
+			"entrada <RET> inválida\n\n"
+		);
+		PRINT_STR(PURPLE,"tente novamente: ");
+
+		goto validar_entrada;
+	}
+	//PRINT_DEBUG("entrada: EOF\n");
+	//exit(EXIT_SUCCESS);  // ^D termina a execução
 }

@@ -1,4 +1,6 @@
 
+#define ENTRADA_LEN 16
+
 // ANSI color escape sequences
 #define RESET       "\033[0m" 
 #define BLACK       "\033[0;90m" 
