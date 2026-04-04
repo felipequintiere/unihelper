@@ -1,5 +1,7 @@
 
+#define NOME_LEN 64
 #define ENTRADA_LEN 16
+#define REGISTRO_LEN 451L
 
 // ANSI color escape sequences
 #define RESET       "\033[0m" 
