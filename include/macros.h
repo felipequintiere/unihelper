@@ -18,7 +18,7 @@
 // nota: o macro DEBUG é definido no makefile
 #if defined(DEBUG) && DEBUG==1
 	#define PRINT_DEBUG(fmt, ...) \
-		printf(RED"\n [DEBUG] %s:%d: "RESET \
+		printf(RED"\n[DEBUG] %s:%d: "RESET \
 			fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #else
 	#define PRINT_DEBUG(fmt, ...) do {} while(0)
