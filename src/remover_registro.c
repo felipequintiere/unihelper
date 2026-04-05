@@ -9,34 +9,14 @@
 
 void remover_registro(const char * const arquivo)
 {
-    char entrada[ENTRADA_LEN+1];
+    //char entrada[ENTRADA_LEN+1];
     int id = -1;
-
-    if (id_unico_prox(arquivo) == 0)
-    {
-        PRINT_STR(RED,"\nnão há dados armazenados!\n");
-        return;
-    }
 
     system("clear||cls");
     PRINT_STR(PURPLE,"REMOVENDO REGISTRO:\n");
-    PRINT_STR(GREEN,"selecione o id único: ");
-    for (;;)
-    {
-        ler_entrada(ENTRADA_LEN+1,entrada);
-        if (sscanf(entrada,"%d",&id) == 1)
-        {
-            if (id >= id_unico_prox(arquivo) || id < 0)
-            {
-                PRINT_STR(RED,"\n"
-                    "id único '%d' inválido!\n"
-                    "tente novamente: ",
-                id);
-            }
-            else
-                break;
-        }
-    }
+	id = buscar_registro_id(arquivo);
+	if (id == -1)
+		return;
 
 
 

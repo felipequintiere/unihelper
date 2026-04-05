@@ -20,6 +20,7 @@ void editar_registro(const char * const arquivo)
 
 	system("clear||cls");
 	PRINT_STR(PURPLE,"EDITANDO REGISTRO:\n");
+
 	id = buscar_registro_id(arquivo);
 	// se o retorno de buscar_registro_id() for inválido,
 	// retorna para main()
