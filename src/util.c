@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../include/macros.h"
 #include "../include/util.h"
+#include "../include/ler_entrada.h"
 
 long int id_unico_prox(const char * const arquivo)
 {
@@ -135,12 +136,13 @@ void mostrar_registro(Membro *membro)
 			"==================\n"
 			"==================\n"
 			"==================\n"
-		);
+			"id único: %d\n",
+		membro->id_unico);
 	}
 	else if(membro->status_de_validacao == 1)
 	{
-		PRINT_STR(BLUE,"tipo:          %s\n",((membro->tipo) ? "professor" : "aluno"));
 		PRINT_STR(BLUE,"nome:          %s\n",membro->nome);
+		PRINT_STR(BLUE,"tipo:          %s\n",((membro->tipo) ? "professor" : "aluno"));
 
 		if (membro->tipo == ALUNO)
 		{
@@ -160,3 +162,62 @@ void mostrar_registro(Membro *membro)
 	}
 }
 
+// quarta opção do programa
+int buscar_registro_id(const char * const arquivo)
+{
+    char entrada[ENTRADA_LEN+1];
+    int id = -1;
+
+    if (id_unico_prox(arquivo) == 0)
+    {
+        PRINT_STR(RED,"\nnão há dados armazenados em '%s'!\n",arquivo);
+		return -1;
+    }
+
+    PRINT_STR(GREEN,"selecione o id único: ");
+    for (;;)
+    {
+        ler_entrada(ENTRADA_LEN+1,entrada);
+        if (sscanf(entrada,"%d",&id) == 1)
+        {
+            if (id >= id_unico_prox(arquivo) || id < 0)
+            {
+                PRINT_STR(RED,"\n"
+                    "id único '%d' inválido!\n"
+                    "tente novamente: ",
+                id);
+            }
+            else
+                break;
+        }
+    }
+
+    Membro *membro = (Membro*) malloc(sizeof(Membro));
+    arquivo_para_registro(membro,id,arquivo);
+	mostrar_registro(membro);
+
+	return id;
+}
+
+// sexta opção do programa
+void listar_registros(const char * const arquivo)
+{
+	Membro *membro = (Membro*) malloc(sizeof(Membro));
+
+	system("clear||cls");
+	PRINT_STR(PURPLE,"LISTANDO REGISTROS:\n");
+
+	if (id_unico_prox(arquivo) == 0)
+	{
+		PRINT_STR(RED,"\nnão há dados armazenados em '%s'\n",arquivo);
+		return;
+	}
+
+	for (int id=0; id<id_unico_prox(arquivo); id++)
+	{
+		arquivo_para_registro(membro,id,arquivo);
+		printf("\n----------------------------------------\n");
+		mostrar_registro(membro);
+	}
+	printf("\n----------------------------------------\n");
+}

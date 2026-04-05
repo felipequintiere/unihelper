@@ -6,14 +6,13 @@
 #include "../include/ler_entrada.h"
 #include "../include/criar_registro.h"
 
-void criar_registro(const char * const arquivo)
+void criar_registro(int prox_id_unico, const char * const arquivo)
 {
 	static Membro membro = { .nome = {0} };
 	char entrada[ENTRADA_LEN+1];
 
 	system("clear||cls");
 	PRINT_STR(PURPLE,"CRIANDO REGISTRO:\n");
-
 
 	PRINT_STR(GREEN,"nome completo: ");
 	ler_entrada(NOME_LEN+1,membro.nome); // espera char* (não signed char*)
@@ -106,9 +105,11 @@ void criar_registro(const char * const arquivo)
 			goto ler_tipo;
 	}
 
-	membro.id_unico = id_unico_prox(arquivo);
+
+
+	membro.id_unico = prox_id_unico;
 	membro.status_de_validacao = 1; //true
 
-	Membro *nmembro = &membro;	
-	registro_para_arquivo(nmembro, nmembro->id_unico, arquivo);
+	Membro *ptr_membro = &membro;	
+	registro_para_arquivo(ptr_membro,prox_id_unico,arquivo);
 }

@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 // #include <stdint.h>
 // #include <inttypes.h>  // format specifiers
 
-#include <stdbool.h>
 
 #include "./include/macros.h"
 #include "./include/types.h"
@@ -14,11 +14,9 @@
 #include "./include/ler_entrada.h"
 #include "./include/criar_registro.h"
 #include "./include/editar_registro.h"
+#include "./include/remover_registro.h"
 
 #define ARQUIVO_DADOS "./dados.bin"
-
-
-void remover_registro(const char * const);
 
 int main(int argc, char *argv[])
 {
@@ -56,6 +54,8 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				/*
+				// para forçar o usuário a criar o arquivo
 				FILE *fp;
 				if ((fp = fopen(argv[2],"rb")) == NULL)
 				{
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 					exit(EXIT_FAILURE);
 				}
 				fclose(fp);
+				*/
 
 				arquivo = argv[2]; // armazenar o nome do arquivo escolhido
 				PRINT_DEBUG("%s\n",arquivo);
@@ -104,18 +105,20 @@ int main(int argc, char *argv[])
 
 		switch (entrada[0])
 		{
-			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
+			case '1': criar_registro(id_unico_prox(arquivo),arquivo);  // ./src/criar_registro.c
 				break;
 			case '2': editar_registro(arquivo); // ./src/editar_registro.c
 				break;
-			case '3': remover_registro(arquivo);
+			case '3': remover_registro(arquivo); // ./src/remover_registro.c
 				break;
-			case '4': //print();
+			case '4': buscar_registro_id(arquivo); // ./src/util.c
 				break;
-			case '5': return 0;
+			case '5': //buscar_registro_nome();
 				break;
-			case '7':
-				exit(EXIT_SUCCESS);
+			case '6': listar_registros(arquivo); // ./src/util.c
+				break;
+			case '7': exit(EXIT_SUCCESS);
+
 			default:
 				fprintf(stderr,"opção '%c' inválida!\n",entrada[0]);
 		}
@@ -123,53 +126,4 @@ int main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 }
 
-void remover_registro(const char * const arquivo)
-{
-	char entrada[ENTRADA_LEN+1];
-	int id = -1;
-	
-	if (id_unico_prox(arquivo) == 0)
-	{
-		PRINT_STR(RED,"\nnão há dados armazenados!\n");
-		return;
-	}
 
-	system("clear||cls");
-	PRINT_STR(PURPLE, "\nREMOVENDO REGISTRO:\n");
-	PRINT_STR(GREEN,"selecione o id único: ");
-	for (;;)
-	{
-		ler_entrada(ENTRADA_LEN+1,entrada);
-		if (sscanf(entrada,"%d",&id) == 1)
-		{
-			if (id >= id_unico_prox(arquivo) || id < 0)
-			{
-				PRINT_STR(RED,"\n"
-					"id único '%d' inválido!\n"
-					"tente novamente: ",
-				id);
-			}	
-			else
-				break;
-		}
-	}
-
-
-
-	Membro *membro = (Membro*) malloc(sizeof(Membro));
-
-	// escreve do aquivo binário para o registro na memória
-	arquivo_para_registro(membro,id,arquivo);
-
-	if (membro->status_de_validacao == 0)
-	{
-		PRINT_STR(RED,"\n\nO REGISTRO JÁ HAVIA SIDO REMOVIDO\n");
-	}
-	else
-	{
-		//mostrar_registro(membro);
-		PRINT_STR(RED,"\n\nO REGISTRO FOI REMOVIDO\n");
-		membro->status_de_validacao = 0;
-	}
-	registro_para_arquivo(membro,id,arquivo);
-}

@@ -3,6 +3,7 @@
 #include "../include/macros.h"
 #include "../include/types.h"
 #include "../include/util.h"
+#include "../include/criar_registro.h"
 #include "../include/editar_registro.h"
 #include "../include/ler_entrada.h"
 
@@ -18,24 +19,12 @@ void editar_registro(const char * const arquivo)
 	}
 
 	system("clear||cls");
-	PRINT_STR(PURPLE, "EDITANDO REGISTRO:\n");
-	PRINT_STR(GREEN,"selecione o id único do registro a ser editado: ");
-	for (;;)
-	{
-		ler_entrada(ENTRADA_LEN+1,entrada);
-		if (sscanf(entrada,"%d",&id) == 1)
-		{
-			if (id >= id_unico_prox(arquivo) || id < 0)
-			{
-				PRINT_STR(RED,"\n"
-					"id único '%d' inválido!\n"
-					"tente novamente: ",
-				id);
-			}	
-			else
-				break;
-		}
-	}
+	PRINT_STR(PURPLE,"EDITANDO REGISTRO:\n");
+	id = buscar_registro_id(arquivo);
+	// se o retorno de buscar_registro_id() for inválido,
+	// retorna para main()
+	if (id == -1)
+		return;
 
 
 
@@ -44,39 +33,34 @@ void editar_registro(const char * const arquivo)
 	// escreve do aquivo binário para o registro na memória
 	arquivo_para_registro(membro,id,arquivo);
 
-	PRINT_STR(BLUE,"\n\nINFORMAÇÕES DO REGISTRO\n");
+	PRINT_STR(YELLOW,"\nINFORMAÇÕES DO REGISTRO:\n");
 	mostrar_registro(membro);
 
 	if(membro->status_de_validacao == 0)
 	{
 		int opcao = -1;
-		PRINT_STR(GREEN, "criar outro registro nessa posição:\n");
+		PRINT_STR(GREEN,"\n\ncriar outro registro nessa posição?\n");
 		PRINT_STR(CYAN,"\n"
 			"[0] não\n"
-			"[1] sim\n\n"
+			"[1] sim\n"
 		);
-		PRINT_STR(PURPLE,"escolha uma opção: ");
+		PRINT_STR(PURPLE,"\nescolha uma opção: ");
 		for (;;)
 		{
 			ler_entrada(ENTRADA_LEN+1,entrada);
 			if (sscanf(entrada,"%d", &opcao) == 1)
 			{
-				if (opcao == 0 || opcao == 1)
+				if (opcao == 0)
+					break;
+				else if (opcao == 1)
 				{
+					criar_registro(membro->id_unico,arquivo);
 					break;
 				}
 				else
-				PRINT_STR(RED, "\ntente novamente: ");
-				
+					PRINT_STR(RED, "\ntente novamente: ");
 			}
 		}
-
-		if (opcao == 1)
-		{
-//////////////////////////////////////////////////////////////////////////
-///criar_registro(id)
-		}
-
 		return;
 	}
 

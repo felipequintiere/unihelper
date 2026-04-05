@@ -5,4 +5,5 @@ void registro_para_arquivo(Membro *, int id, const char * const);
 void arquivo_para_registro(Membro *, int id, const char * const);
 void mostrar_registro(Membro *);
 
-
+int buscar_registro_id(const char * const);
+void listar_registros(const char * const);

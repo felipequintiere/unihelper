@@ -1,2 +1,2 @@
 
-void criar_registro(const char * const);
+void criar_registro(int, const char * const);
