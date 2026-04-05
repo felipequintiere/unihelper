@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// consider using
+// considere usar
 // #include <stdint.h>
 // #include <inttypes.h>  // for format specifiers
 // note: enums can have different sizes
@@ -11,12 +11,17 @@
 
 #include "./include/macros.h"
 #include "./include/types.h"
+#include "./include/util.h"
 #include "./include/flags.h"
 #include "./include/ler_entrada.h"
 #include "./include/criar_registro.h"
 
 #define ARQUIVO_DADOS "./dados.bin"
 
+
+void editar_registro(const char * const arquivo);
+void arquivo_para_registro(Membro *, FILE *);
+void mostrar_registro(Membro *);
 
 int main(int argc, char *argv[])
 {
@@ -104,7 +109,7 @@ int main(int argc, char *argv[])
 		{
 			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
 				break;
-			case '2': //search();
+			case '2': editar_registro(arquivo);
 				break;
 			case '3': //update();
 				break;
@@ -122,4 +127,111 @@ int main(int argc, char *argv[])
 		}
 	}
 	return EXIT_SUCCESS;
+}
+
+//stdio
+//macro
+//util
+void editar_registro(const char * const arquivo)
+{
+	char entrada[ENTRADA_LEN+1];
+	int id = -1;
+	
+	if (id_unico_prox(arquivo) == 0)
+	{
+		PRINT_STR(RED,"\n não há dados armazenados!\n");
+		return;
+	}
+
+	system("clear||cls");
+	PRINT_STR(PURPLE, "\n EDITANDO REGISTRO:\n");
+
+	PRINT_STR(GREEN," selecione o id único do registro a ser editado: ");
+	for (;;)
+	{
+		ler_entrada(ENTRADA_LEN+1,entrada);
+		if (sscanf(entrada,"%d",&id) == 1)
+		{
+			if (id >= id_unico_prox(arquivo) || id < 0)
+			{
+				PRINT_STR(RED,
+					"\n id único '%d' inválido!\n"
+					"tente novamente: ",
+				id);
+			}	
+			else
+				break;
+		}
+	}
+
+	Membro *membro = (Membro*) malloc(sizeof(Membro));
+
+	FILE *fp;
+	if ((fp = fopen(arquivo,"rb")) == NULL)
+	{
+		exit(EXIT_FAILURE);
+	}
+	fseek(fp, (REGISTRO_LEN * (long) id), SEEK_SET);
+
+	arquivo_para_registro(membro, fp);
+	mostrar_registro(membro);
+
+	fclose(fp);
+}
+
+
+void arquivo_para_registro(Membro *membro, FILE *fp)
+{
+	fread(&membro->id_unico,
+		sizeof(membro->id_unico),1,fp);
+
+	fread(&membro->status_de_validacao,
+		sizeof(membro->status_de_validacao),1,fp);
+
+	fread(&membro->nome,
+		sizeof(membro->nome),1,fp);
+
+	fread(&membro->numero_de_disciplinas,
+		sizeof(membro->numero_de_disciplinas),1,fp);
+
+	fread(&membro->grade,
+		sizeof(membro->grade),1,fp);
+
+	fread(&membro->tipo, sizeof(membro->tipo), 1, fp);
+	if (membro->tipo == ALUNO)
+	{
+		fread(&membro->dados.aluno.matricula,
+			sizeof(membro->dados.aluno.matricula),1,fp);
+
+		fread(&membro->dados.aluno.periodo,
+			sizeof(membro->dados.aluno.periodo),1,fp);
+	}
+	else if (membro->tipo == PROFESSOR)
+	{
+		fread(&membro->dados.professor.registro,
+			sizeof(membro->dados.professor.registro),1,fp);
+		fread(&membro->dados.professor.salario,
+			sizeof(membro->dados.professor.salario),1,fp);
+	}
+}
+
+void mostrar_registro(Membro *membro)
+{
+	printf("\nid único: %u\n",membro->id_unico);
+	printf("status de validação: %hd\n",membro->status_de_validacao);
+	printf("nome: %s\n",membro->nome);
+	printf("número de disciplinas: %d\n",membro->numero_de_disciplinas);
+	//grade
+	printf("tipo: %d\n",membro->tipo);
+
+	if (membro->tipo == ALUNO)
+	{
+		printf("matrícula: %llu\n",membro->dados.aluno.matricula);
+		printf("período: %hd\n",membro->dados.aluno.periodo);
+	}
+	else if (membro->tipo == PROFESSOR)
+	{
+		printf("registro: %llu\n",membro->dados.professor.registro);
+		printf("salário: %f\n",membro->dados.professor.salario);
+	}
 }

@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include "../include/macros.h"
 #include "../include/types.h"
+#include "../include/util.h"
 #include "../include/ler_entrada.h"
 #include "../include/criar_registro.h"
-
-int atribuir_id(const char * const);
 
 Membro* criar_registro(const char * const arquivo)
 {
@@ -35,9 +34,13 @@ Membro* criar_registro(const char * const arquivo)
 	ler_tipo:
 	for (;;)
 	{
+		int tmp;
 		ler_entrada(ENTRADA_LEN+1,entrada);
-		if (sscanf(entrada,"%d", (int*) &membro.tipo) == 1)
+		if (sscanf(entrada,"%d",&tmp) == 1)
+		{
+			membro.tipo = tmp;
 			break;
+		}
 
 		PRINT_STR(RED, "\n tente novamente: ");
 	}
@@ -103,8 +106,8 @@ Membro* criar_registro(const char * const arquivo)
 			goto ler_tipo;
 	}
 
+	membro.id_unico = id_unico_prox(arquivo);
 	membro.status_de_validacao = 1; //true
-	membro.id_unico = atribuir_id(arquivo);
 
 
 
@@ -114,11 +117,11 @@ Membro* criar_registro(const char * const arquivo)
 		exit(EXIT_FAILURE);
 	}
 
-	fwrite(&membro.status_de_validacao,
-		sizeof(membro.status_de_validacao),1,fp);
-
 	fwrite(&membro.id_unico,
 		sizeof(membro.id_unico),1,fp);
+
+	fwrite(&membro.status_de_validacao,
+		sizeof(membro.status_de_validacao),1,fp);
 
 	fwrite(&membro.nome,
 		sizeof(membro.nome),1,fp);
@@ -137,35 +140,23 @@ Membro* criar_registro(const char * const arquivo)
 
 		fwrite(&membro.dados.aluno.periodo,
 			sizeof(membro.dados.aluno.periodo),1,fp);
-
-		// o registro do tipo aluno é menor que o do tipo professor
-		// professor: 451L
-		// aluno:     449
-		for (int i=0; i<(451-449); i++) 
-		{
-			fputc(0,fp);
-		}
 	}
 	else if (membro.tipo == PROFESSOR)
 	{
 		fwrite(&membro.dados.professor.registro, sizeof(membro.dados.professor.registro),1,fp);
 		fwrite(&membro.dados.professor.salario,  sizeof(membro.dados.professor.salario),1,fp);
 	}
-	fclose(fp);
 
-	return &membro;
-}
 
-int atribuir_id(const char * const arquivo)
-{
-	FILE *fp;
-	if ((fp = fopen(arquivo,"ab+")) == NULL)
+	int t_prof = (int) REGISTRO_PROFESSOR;
+	int t_alun = (int) REGISTRO_ALUNO;
+	int t_mod_dif = (t_prof>=t_alun ? t_prof-t_alun : t_alun-t_prof);
+	for (int i=0; i<(t_mod_dif); i++) 
 	{
-		exit(EXIT_FAILURE);
+		fputc(0,fp);
 	}
 
-	long id = ftell(fp)/REGISTRO_LEN;
-	fclose(fp);
 
-	return id ;
+	fclose(fp);
+	return &membro;
 }
