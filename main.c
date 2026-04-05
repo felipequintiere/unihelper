@@ -2,26 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-// considere usar
 // #include <stdint.h>
-// #include <inttypes.h>  // for format specifiers
-// note: enums can have different sizes
+// #include <inttypes.h>  // format specifiers
 
 #include <stdbool.h>
 
 #include "./include/macros.h"
 #include "./include/types.h"
-#include "./include/util.h"
 #include "./include/flags.h"
+#include "./include/util.h"
 #include "./include/ler_entrada.h"
 #include "./include/criar_registro.h"
+#include "./include/editar_registro.h"
 
 #define ARQUIVO_DADOS "./dados.bin"
 
 
-void editar_registro(const char * const);
-void arquivo_para_registro(Membro *, int, const char * const);
-void mostrar_registro(Membro *);
+void remover_registro(const char * const);
 
 int main(int argc, char *argv[])
 {
@@ -109,9 +106,9 @@ int main(int argc, char *argv[])
 		{
 			case '1': criar_registro(arquivo);  // ./src/criar_registro.c
 				break;
-			case '2': editar_registro(arquivo);
+			case '2': editar_registro(arquivo); // ./src/editar_registro.c
 				break;
-			case '3': //update();
+			case '3': remover_registro(arquivo);
 				break;
 			case '4': //print();
 				break;
@@ -121,18 +118,12 @@ int main(int argc, char *argv[])
 				exit(EXIT_SUCCESS);
 			default:
 				fprintf(stderr,"opção '%c' inválida!\n",entrada[0]);
-			//RETURN VALUE fgetc(3)
-			//	fgetc(), getc(), and getchar() return the character read as an
-			//	unsigned char cast to an int or EOF on end of file or error.
 		}
 	}
 	return EXIT_SUCCESS;
 }
 
-//stdio
-//macro
-//util
-void editar_registro(const char * const arquivo)
+void remover_registro(const char * const arquivo)
 {
 	char entrada[ENTRADA_LEN+1];
 	int id = -1;
@@ -144,8 +135,8 @@ void editar_registro(const char * const arquivo)
 	}
 
 	system("clear||cls");
-	PRINT_STR(PURPLE, "\nEDITANDO REGISTRO:\n");
-	PRINT_STR(GREEN,"selecione o id único do registro a ser editado: ");
+	PRINT_STR(PURPLE, "\nREMOVENDO REGISTRO:\n");
+	PRINT_STR(GREEN,"selecione o id único: ");
 	for (;;)
 	{
 		ler_entrada(ENTRADA_LEN+1,entrada);
@@ -166,115 +157,19 @@ void editar_registro(const char * const arquivo)
 
 
 	Membro *membro = (Membro*) malloc(sizeof(Membro));
-	// escreve do aquivo para o registro
+
+	// escreve do aquivo binário para o registro na memória
 	arquivo_para_registro(membro,id,arquivo);
-	mostrar_registro(membro);
 
-
-
-	PRINT_STR(GREEN,"\nmodificar: ");
-	PRINT_STR(PURPLE,"\n\n"
-	"[1] nome\n"
-	"[2] matrícula\n"
-	"[3] período\n"
-	"[4] n° de disciplinas\n"
-	"[5] grade\n"
-	"[6-7] sair\n\n");
-	PRINT_STR(GREEN,"escolha uma opção: ");
-	for (;;)
+	if (membro->status_de_validacao == 0)
 	{
-		ler_entrada(ENTRADA_LEN+1,entrada);
-		if (sscanf(entrada,"%d",&id) == 1)
-		{
-				break;
-		}
+		PRINT_STR(RED,"\n\nO REGISTRO JÁ HAVIA SIDO REMOVIDO\n");
 	}
-
-	switch (entrada[0])
+	else
 	{
-		case '1': break;
-			break;
-		case '2': break;
-			break;
-		case '3': break;
-			break;
-		case '4': break;
-			break;
-		case '5': break;
-			break;
-		case '7':
-				  return;
-		default:
-			fprintf(stderr,"opção '%c' inválida!\n",entrada[0]);
+		//mostrar_registro(membro);
+		PRINT_STR(RED,"\n\nO REGISTRO FOI REMOVIDO\n");
+		membro->status_de_validacao = 0;
 	}
-}
-
-
-void arquivo_para_registro(Membro *membro, int id, const char * const arquivo)
-{
-	FILE *fp;
-	if ((fp = fopen(arquivo,"rb")) == NULL)
-	{
-		exit(EXIT_FAILURE);
-	}
-	fseek(fp, (REGISTRO_LEN * (long) id), SEEK_SET);
-
-
-
-	fread(&membro->id_unico,
-		sizeof(membro->id_unico),1,fp);
-
-	fread(&membro->status_de_validacao,
-		sizeof(membro->status_de_validacao),1,fp);
-
-	fread(&membro->nome,
-		sizeof(membro->nome),1,fp);
-
-	fread(&membro->numero_de_disciplinas,
-		sizeof(membro->numero_de_disciplinas),1,fp);
-
-	fread(&membro->grade,
-		sizeof(membro->grade),1,fp);
-
-	fread(&membro->tipo, sizeof(membro->tipo), 1, fp);
-	if (membro->tipo == ALUNO)
-	{
-		fread(&membro->dados.aluno.matricula,
-			sizeof(membro->dados.aluno.matricula),1,fp);
-
-		fread(&membro->dados.aluno.periodo,
-			sizeof(membro->dados.aluno.periodo),1,fp);
-	}
-	else if (membro->tipo == PROFESSOR)
-	{
-		fread(&membro->dados.professor.registro,
-			sizeof(membro->dados.professor.registro),1,fp);
-		fread(&membro->dados.professor.salario,
-			sizeof(membro->dados.professor.salario),1,fp);
-	}
-
-	fclose(fp);
-}
-
-void mostrar_registro(Membro *membro)
-{
-	printf("\n");
-	PRINT_STR(BLUE,"tipo: %s\n",((membro->tipo) ? "professor" : "aluno"));
-	PRINT_STR(BLUE,"nome: %s\n",membro->nome);
-
-	if (membro->tipo == ALUNO)
-	{
-		PRINT_STR(BLUE,"matrícula: %llu\n",membro->dados.aluno.matricula);
-		PRINT_STR(BLUE,"período: %hd\n",membro->dados.aluno.periodo);
-	}
-	else if (membro->tipo == PROFESSOR)
-	{
-		PRINT_STR(BLUE,"registro: %llu\n",membro->dados.professor.registro);
-		PRINT_STR(BLUE,"salário: %f\n",membro->dados.professor.salario);
-	}
-
-	PRINT_STR(BLUE,"n° de disciplinas: %d\n",membro->numero_de_disciplinas);
-	PRINT_STR(BLUE,"id único: %u\n",membro->id_unico);
-	//PRINT_STR(BLUE,"status de validação: %hd\n",membro->status_de_validacao);
-	//grade
+	registro_para_arquivo(membro,id,arquivo);
 }

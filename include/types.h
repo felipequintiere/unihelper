@@ -1,31 +1,7 @@
-
-// O que acontece ao retirar o include da biblioteca
-// stdbool desse header (types.h)?
-//
-// Se houver um '#include <stdbool.h>' no main.c, nada
-// de atípico ocorre. Entretanto, se não existir um
-// include no main.c ou(inclusivo) nesse arquivo, a
-// seguinte mensagem será mostrada:
-// ```
-// $ make
-// gcc -Wall -Wextra -Werror -O1   -c -o main.o main.c
-// In file included from main.c:7:
-// types.h:27:9: error: unknown type name ‘bool’
-//    27 |         bool status_de_validacao;      // indicador de remoção
-//       |         ^~~~
-// types.h:1:1: note: ‘bool’ is defined in header ‘<stdbool.h>’; this is probably fixable by adding ‘#include <stdbool.h>’
-//   +++ |+#include <stdbool.h>
-//     1 |
-// make: *** [<builtin>: main.o] Error 1
-// ```
-#ifndef INCLUDE_STDBOOL
-#define INCLUDE_STDBOOL
-#include <stdbool.h>
-#endif
+#ifndef INCLUDE_TYPES
+#define INCLUDE_TYPES
 
 #include "./macros.h"
-#define DIAS 5
-#define TURNOS 18
 
 typedef struct {  // ESTRUTURA ALUNO
 	unsigned long long matricula;
@@ -51,6 +27,7 @@ typedef struct {  // ESTRUTRURA COMUM ENTRE OS TIPOS
 	//     j: horários (m1 <-> t3 <-> n6)
 	// nota: os elementos são os códigos de disciplinas
 
+	// nota: tamanho variável do tipo enum
 	enum {ALUNO = 0, PROFESSOR} tipo;
 	union {
 		Dados_aluno aluno;
@@ -59,4 +36,5 @@ typedef struct {  // ESTRUTRURA COMUM ENTRE OS TIPOS
 	// nota: structs/unions anônimos são padrão apenas a partir 
 	// do C11
 } Membro;
+#endif
 

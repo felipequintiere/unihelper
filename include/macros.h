@@ -4,6 +4,9 @@
 #define REGISTRO_PROFESSOR 451L
 #define REGISTRO_ALUNO 449
 
+#define DIAS 5
+#define TURNOS 18
+
 // ANSI color escape sequences
 #define RESET       "\033[0m" 
 #define BLACK       "\033[0;90m" 
