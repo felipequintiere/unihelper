@@ -21,6 +21,7 @@ void editar_registro(const char * const arquivo)
 	system("clear||cls");
 	PRINT_STR(PURPLE,"EDITANDO REGISTRO:\n");
 
+	//PRINT_STR(YELLOW,"\nINFORMAÇÕES DO REGISTRO:\n");
 	id = buscar_registro_id(arquivo);
 	// se o retorno de buscar_registro_id() for inválido,
 	// retorna para main()
@@ -30,12 +31,7 @@ void editar_registro(const char * const arquivo)
 
 
 	Membro *membro = (Membro*) malloc(sizeof(Membro));
-
-	// escreve do aquivo binário para o registro na memória
 	arquivo_para_registro(membro,id,arquivo);
-
-	PRINT_STR(YELLOW,"\nINFORMAÇÕES DO REGISTRO:\n");
-	mostrar_registro(membro);
 
 	if(membro->status_de_validacao == 0)
 	{
@@ -93,7 +89,7 @@ void editar_registro(const char * const arquivo)
 			case '1':
 			{
     			PRINT_STR(GREEN, "nome completo: ");
-    				ler_entrada(NOME_LEN+1,membro->nome);
+    			ler_entrada(NOME_LEN+1,membro->nome);
 				break;
 			}
 			case '2':
@@ -106,8 +102,8 @@ void editar_registro(const char * const arquivo)
 						break;
 
 					PRINT_STR(RED, "\ntente novamente: ");
-					break;
 				}
+				break;
 			}
 			case '3':
 			{
@@ -119,8 +115,8 @@ void editar_registro(const char * const arquivo)
 						break;
 
 					PRINT_STR(RED, "\ntente novamente: ");
-					break;
 				}
+				break;
 			}
 			case '4':
 			{
@@ -132,13 +128,13 @@ void editar_registro(const char * const arquivo)
 						break;
 
 					PRINT_STR(RED, "\n tente novamente: ");
-					break;
 				}
+				break;
 			}
 			case '5':
 			{
-				PRINT_STR(GREEN, "grade: ");
-				PRINT_STR(GREEN, "\n");
+				PRINT_STR(GREEN, "grade:\n");
+				gerar_grade(membro);
 				break;
 			}
 			case '6':
@@ -173,7 +169,7 @@ void editar_registro(const char * const arquivo)
 			case '1':
 			{
     			PRINT_STR(GREEN, "nome completo: ");
-    				ler_entrada(NOME_LEN+1,membro->nome);
+				ler_entrada(NOME_LEN+1,membro->nome);
 				break;
 			}
 			case '2':
@@ -217,8 +213,8 @@ void editar_registro(const char * const arquivo)
 			}
 			case '5':
 			{
-				PRINT_STR(GREEN, "grade: ");
-				PRINT_STR(GREEN, "\n");
+				PRINT_STR(GREEN, "grade:\n");
+				gerar_grade(membro);
 				break;
 			}
 			case '6':

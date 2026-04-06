@@ -17,28 +17,18 @@ void criar_registro(int prox_id_unico, const char * const arquivo)
 	PRINT_STR(GREEN,"nome completo: ");
 	ler_entrada(NOME_LEN+1,membro.nome); // espera char* (não signed char*)
 
-	PRINT_STR(GREEN,"n° de disciplinas: ");
-	for (;;) {
-		ler_entrada(ENTRADA_LEN+1,entrada);
-		if (sscanf(entrada,"%d", &membro.numero_de_disciplinas) == 1) {
-			break;
-		}
-		PRINT_STR(RED,"\ntente novamente: ");
-	}
-
-	PRINT_STR(GREEN,"grade: ");
-	PRINT_STR(GREEN,"\n");
-
 	PRINT_STR(GREEN,"aluno(0) ou professor(1): ");
-	ler_tipo:
 	for (;;)
 	{
 		int tmp;
 		ler_entrada(ENTRADA_LEN+1,entrada);
 		if (sscanf(entrada,"%d",&tmp) == 1)
 		{
-			membro.tipo = tmp;
-			break;
+			if (tmp == ALUNO || tmp == PROFESSOR)
+			{
+				membro.tipo = tmp;
+				break;
+			}
 		}
 
 		PRINT_STR(RED,"\ntente novamente: ");
@@ -95,15 +85,19 @@ void criar_registro(int prox_id_unico, const char * const arquivo)
 			}
 			break;
 		}
-
-		default:
-			PRINT_STR(RED,
-				"'%d' opção inválida!\n"
-				"tente novamente: ",
-				membro.tipo
-			);
-			goto ler_tipo;
 	}
+
+	PRINT_STR(GREEN,"n° de disciplinas: ");
+	for (;;) {
+		ler_entrada(ENTRADA_LEN+1,entrada);
+		if (sscanf(entrada,"%d", &membro.numero_de_disciplinas) == 1) {
+			break;
+		}
+		PRINT_STR(RED,"\ntente novamente: ");
+	}
+
+	PRINT_STR(GREEN,"grade:\n");
+	gerar_grade(&membro);
 
 
 
@@ -112,4 +106,64 @@ void criar_registro(int prox_id_unico, const char * const arquivo)
 
 	Membro *ptr_membro = &membro;	
 	registro_para_arquivo(ptr_membro,prox_id_unico,arquivo);
+}
+
+
+
+void gerar_grade(Membro *membro)
+{
+	char entrada[ENTRADA_LEN+1];
+	int codigo;
+	int dia;
+	int horario;
+
+	PRINT_STR(BLUE,
+		" nota:\n"
+		"  1. insira '0' no prompt para retornar;\n"
+		"  2. insira o código de disciplina '0' para excluir uma aula,\n"
+		"  caso contrário, utilize um código de 5 dígitos;\n"
+	);
+	for(;;)
+	{
+		PRINT_STR(BLUE,"escolha o código da disciplina: ");
+		for (;;)
+		{
+			ler_entrada(ENTRADA_LEN+1,entrada);
+			if (sscanf(entrada,"%d",&codigo)==1)
+				break;
+
+			PRINT_STR(RED,"\ntente novamente: ");
+		}
+
+		PRINT_STR(CYAN,"escolha o dia da semana [1-5]: ");
+		for (;;)
+		{
+			ler_entrada(ENTRADA_LEN+1,entrada);
+			if (sscanf(entrada,"%d",&dia)==1)
+				break;
+
+			PRINT_STR(RED,"\ntente novamente: ");
+		}
+		if (dia == 0)
+			break;
+
+
+		for(;;)
+		{
+			PRINT_STR(YELLOW,"escolha o horário [1-18]: ");
+			for(;;)
+			{
+				ler_entrada(ENTRADA_LEN+1,entrada);
+				if (sscanf(entrada,"%d",&horario)==1)
+					break;
+
+				PRINT_STR(RED,"\ntente novamente: ");
+
+			}
+			if (horario >=1 && horario <= 18)
+				membro->grade[dia-1][horario-1] = codigo;
+			else if (horario == 0)
+				break;
+		}
+	}
 }

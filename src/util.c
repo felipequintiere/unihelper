@@ -12,6 +12,7 @@ long int id_unico_prox(const char * const arquivo)
 		exit(EXIT_FAILURE);
 	}
 
+	// nota sobre o modo "ab+" (man 3 fopen):
 	// necessário porque não houve leitura nem escrita
 	// antes de usar o ftell()
 	fseek(fp, 0L, SEEK_END);
@@ -21,6 +22,7 @@ long int id_unico_prox(const char * const arquivo)
 	return id;
 }
 
+// lê as informações contidas em um registro na memória e escreve em um arquivo
 void registro_para_arquivo(Membro *membro, int id, const char * const arquivo)
 {
 	FILE *fp;
@@ -77,6 +79,7 @@ void registro_para_arquivo(Membro *membro, int id, const char * const arquivo)
 }
 
 
+// lê as informações contidas em um arquivo e escreve em um registro na memória
 void arquivo_para_registro(Membro *membro, int id, const char * const arquivo)
 {
 	FILE *fp;
@@ -141,24 +144,34 @@ void mostrar_registro(Membro *membro)
 	}
 	else if(membro->status_de_validacao == 1)
 	{
-		PRINT_STR(BLUE,"nome:          %s\n",membro->nome);
-		PRINT_STR(BLUE,"tipo:          %s\n",((membro->tipo) ? "professor" : "aluno"));
+		PRINT_STR(BLUE,"nome:           %s\n",membro->nome);
+		PRINT_STR(BLUE,"tipo:           %s\n",((membro->tipo) ? "professor" : "aluno"));
 
 		if (membro->tipo == ALUNO)
 		{
-			PRINT_STR(BLUE,"matrícula:     %llu\n",membro->dados.aluno.matricula);
-			PRINT_STR(BLUE,"período:       %hd\n",membro->dados.aluno.periodo);
+			PRINT_STR(BLUE,"matrícula:      %llu\n",membro->dados.aluno.matricula);
+			PRINT_STR(BLUE,"período:        %hd\n",membro->dados.aluno.periodo);
 		}
 		else if (membro->tipo == PROFESSOR)
 		{
-			PRINT_STR(BLUE,"identificação: %llu\n",membro->dados.professor.registro);
-			PRINT_STR(BLUE,"salário:       %.2f\n",membro->dados.professor.salario);
+			PRINT_STR(BLUE,"identificação:  %llu\n",membro->dados.professor.registro);
+			PRINT_STR(BLUE,"salário:        %.2f\n",membro->dados.professor.salario);
 		}
 
-		PRINT_STR(BLUE,"n disciplinas: %d\n",membro->numero_de_disciplinas);
-		PRINT_STR(BLUE,"id único:      %u\n",membro->id_unico);
+		PRINT_STR(BLUE,"n disciplinas:  %d\n",membro->numero_de_disciplinas);
+		
+		PRINT_STR(BLUE,"grade:");
+		for (int i=0; i < DIAS; i++)
+		{
+			PRINT_STR(BLUE,"\n%dª-feira:  ",(i+2));
+			for (int j=0; j<TURNOS; j++)
+			{
+				PRINT_STR(BLUE,"%*d",6,(membro->grade[i][j]));
+			}
+		}
+		printf("\n");
 		//PRINT_STR(BLUE,"status de validação: %hd\n",membro->status_de_validacao);
-		//grade
+		PRINT_STR(GREEN,"id único:       %u\n",membro->id_unico);
 	}
 }
 

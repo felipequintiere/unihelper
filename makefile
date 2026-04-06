@@ -1,7 +1,7 @@
 CC := cc
-CPPFLAGS := -DDEBUG=1 -I./include 
+#CPPFLAGS := -DDEBUG=1 -I./include 
+CPPFLAGS := -DDEBUG=0
 CFLAGS := -Wall -Wextra -Werror -O2
-#CFLAGS := -O0
 
 BINARY := a.out
 
@@ -18,8 +18,8 @@ all : $(BINARY)
 $(BINARY) : $(OBJECTS)
 	$(CC) -o $@ $^
 
-main.o : ./include/macros.h ./include/types.h ./include/flags.h
-flags.o : ./include/flags.h
+#main.o : ./include/macros.h ./include/types.h ./include/flags.h
+#flags.o : ./include/flags.h
 
 .PHONY : clean
 clean : ; rm -f $(OBJECTS)

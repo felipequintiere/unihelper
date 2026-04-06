@@ -6,7 +6,6 @@
 // #include <stdint.h>
 // #include <inttypes.h>  // format specifiers
 
-
 #include "./include/macros.h"
 #include "./include/types.h"
 #include "./include/flags.h"
@@ -106,7 +105,8 @@ int main(int argc, char *argv[])
 
 		switch (entrada[0])
 		{
-			case '1': criar_registro(id_unico_prox(arquivo),arquivo);  // ./src/criar_registro.c
+			// ./src/criar_registro.c
+			case '1': criar_registro(id_unico_prox(arquivo),arquivo);
 				break;
 			case '2': editar_registro(arquivo); // ./src/editar_registro.c
 				break;
@@ -150,7 +150,8 @@ void buscar_registro_nome(const char * const arquivo)
 	for (int id=0; id<ultimo_id; id++)
 	{
 		arquivo_para_registro(membro,id,arquivo);
-		if (strstr(membro->nome, entrada) != NULL)
+		if (strstr(membro->nome,entrada) != NULL && 
+			membro->status_de_validacao != 0)
 		{
 			printf("\n----------------------------------------\n");
 			mostrar_registro(membro);	
